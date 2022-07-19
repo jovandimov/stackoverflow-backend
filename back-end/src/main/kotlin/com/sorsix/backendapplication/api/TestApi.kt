@@ -16,4 +16,10 @@ class TestApi(
 
     @GetMapping
     fun getList(): MutableList<Question> = questionRepository.findAll();
+
+    //Linaaaaaaaaaaa
+    fun getLina()
+    {
+        print("Lina")
+    }
 }
