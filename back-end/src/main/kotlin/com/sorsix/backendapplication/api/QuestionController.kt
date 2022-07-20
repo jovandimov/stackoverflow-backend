@@ -1,15 +1,17 @@
 package com.sorsix.backendapplication.api
 
+import com.sorsix.backendapplication.api.dto.QuestionRequest
 import com.sorsix.backendapplication.domain.Question
+import com.sorsix.backendapplication.domain.Tag
 import com.sorsix.backendapplication.service.QuestionService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import com.sorsix.backendapplication.service.TagService
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/questions")
 class QuestionController(
-    val questionService: QuestionService
+    val questionService: QuestionService,
+    val tagService: TagService,
 ) {
 
     @GetMapping
@@ -20,5 +22,15 @@ class QuestionController(
     @GetMapping("/withoutAnswers")
     fun getAllQuestionsWithoutAnswers(): List<Question>? {
         return questionService.findAllQuestionsWithoutAnswers();
+    }
+
+    @PostMapping
+    fun createQuestion(@RequestBody request: QuestionRequest) {
+        questionService.createQuestion(request.title,
+            request.questionText,
+            request.parentQuestionId,
+            request.appUserId,
+            request.tagsId)
+
     }
 }
