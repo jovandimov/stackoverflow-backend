@@ -1,9 +1,6 @@
 package com.sorsix.backendapplication.service
 
-import com.sorsix.backendapplication.domain.Question
-import com.sorsix.backendapplication.domain.QuestionCreated
-import com.sorsix.backendapplication.domain.QuestionFailed
-import com.sorsix.backendapplication.domain.QuestionResult
+import com.sorsix.backendapplication.domain.*
 import com.sorsix.backendapplication.repository.AppUserRepository
 import com.sorsix.backendapplication.repository.QuestionRepository
 import com.sorsix.backendapplication.repository.QuestionTagRepository
@@ -36,8 +33,10 @@ class QuestionService(
     ): QuestionResult {
         val tags = tagsId?.let { tagRepository.findAllById(it) }
         println(tags)
-//        val appUser = appUserId?.let { appUserRepository.findById(it) }
-        val appUser = appUserRepository.findByIdOrNull(appUserId);
+        //val appUser = appUserRepository.findByIdOrNull(appUserId);
+        val appUser: AppUser? = appUserId.let {
+            appUserRepository.findByIdOrNull(it)
+        }
         println(appUser)
         //val parentQuestion = questionRepository.findByIdOrNull(parentQuestionId);
         val parentQuestion: Question? = parentQuestionId.let {
@@ -49,7 +48,7 @@ class QuestionService(
         }
         println(parentQuestion)
 
-        return if (tags == null && appUser == null) {
+        return if (tags == null || appUser == null) {
             QuestionFailed("error :)")
         } else {
             val question = Question(title = title, questionText = questionText,
@@ -59,6 +58,18 @@ class QuestionService(
             QuestionCreated(question = question);
         }
 
+    }
+
+    fun findById(id: Long): Question? {
+        return questionRepository.findByIdOrNull(id);
+    }
+
+    fun getAnswersForQuestion(id: Long): List<Question>? {
+        return questionRepository.findAll().filter { id == it.parentQuestion?.id };
+    }
+
+    fun findAllQuestionsWithMentionedWord(word: String): List<Question>? {
+        return questionRepository.findAll().filter { it.title.contains(word) || it.questionText.contains(word) }
     }
 
 }
